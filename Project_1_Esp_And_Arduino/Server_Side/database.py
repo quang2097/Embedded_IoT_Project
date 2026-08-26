@@ -1,6 +1,7 @@
 from dotenv import load_dotenv
 from sqlalchemy.ext.asyncio import create_async_engine
 import os
+from sqlalchemy import text
 
 load_dotenv()
 
