@@ -1,0 +1,40 @@
+Step 1:
+    install ESP-IDF:
+        sudo apt update
+        sudo apt install git wget flex bison gperf python3 python3-pip \
+            python3-venv cmake ninja-build ccache libffi-dev libssl-dev \
+            dfu-util libusb-1.0-0
+
+        git clone --recursive https://github.com/espressif/esp-idf.git
+        cd esp-idf
+        ./install.sh esp32
+
+        . ./export.sh
+
+        idf.py --version
+
+Step 2:
+    create cpp project:
+        idf.py create-project my_esp32
+        cd my_esp32
+        idf.py set-target esp32
+
+Step 3:
+    Plug in your ESP32:
+        ls /dev/ttyUSB* /dev/ttyACM*
+
+        /dev/ttyUSB0
+
+Step 4:
+    Build and upload:
+        idf.py build
+
+        idf.py -p /dev/ttyUSB0 flash
+
+        idf.py -p /dev/ttyUSB0 monitor
+
+        idf.py -p /dev/ttyUSB0 build flash monitor
+
+        or:
+
+        idf.py -p /dev/ttyUSB0 build flash monitor
