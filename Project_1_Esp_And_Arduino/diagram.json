@@ -1,0 +1,34 @@
+{
+  "version": 1,
+  "author": "Uri Shaked",
+  "editor": "wokwi",
+  "parts": [
+    { "type": "board-esp32-devkit-c-v4", "id": "esp", "top": 9.6, "left": 91.24, "attrs": {} },
+    { "type": "wokwi-dht22", "id": "dht1", "top": -28.5, "left": -149.4, "attrs": {} },
+    {
+      "type": "wokwi-ntc-temperature-sensor",
+      "id": "ntc1",
+      "top": -83.8,
+      "left": -67.8,
+      "attrs": {}
+    },
+    {
+      "type": "wokwi-photoresistor-sensor",
+      "id": "ldr1",
+      "top": 243.2,
+      "left": -162.4,
+      "attrs": {}
+    }
+  ],
+  "connections": [
+    [ "esp:TX", "$serialMonitor:RX", "", [] ],
+    [ "esp:RX", "$serialMonitor:TX", "", [] ],
+    [ "dht1:VCC", "esp:3V3", "red", [ "v0" ] ],
+    [ "dht1:SDA", "esp:4", "green", [ "v0" ] ],
+    [ "dht1:GND", "esp:GND.1", "black", [ "v0" ] ],
+    [ "ldr1:VCC", "esp:3V3", "red", [ "h0" ] ],
+    [ "ldr1:GND", "esp:GND.3", "black", [ "h0" ] ],
+    [ "ldr1:AO", "esp:34", "green", [ "h0" ] ]
+  ],
+  "dependencies": {}
+}
