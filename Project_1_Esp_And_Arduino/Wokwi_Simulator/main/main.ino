@@ -2,6 +2,7 @@
 #include <WebSocketsClient.h>
 #include <ArduinoJson.h>
 #include <DHT.h>
+#include <WiFiClientSecure.h>  // put this at the top of the file
 
 // ==============================================================================
 // CONFIGURATION
@@ -14,8 +15,8 @@ const char* password = "";
 // WebSocket Server settings
 // If testing locally on your network, use your machine's local IP (e.g., 192.168.1.X)
 // If using a tunnel (like Cloudflare), use the domain without the 'ws://' prefix
-const char* ws_host = "192.168.1.100"; 
-const int   ws_port = 8000;
+const char* ws_host = "combining-caused-achieving-numerous.trycloudflare.com";  // no https://
+const int   ws_port = 443;
 const char* ws_path = "/readings/ws";
 
 // Sensor Pin Definitions
@@ -45,12 +46,48 @@ void webSocketEvent(WStype_t type, uint8_t * payload, size_t length) {
             Serial.printf("[WS] Message from server: %s\n", payload);
             break;
         case WStype_BIN:
-        case WStype_ERROR:			
+            break;
+        case WStype_ERROR:
+            Serial.printf("[WS] Error: %s\n", payload ? (char*)payload : "unknown");
+            break;		
         case WStype_FRAGMENT_TEXT_START:
         case WStype_FRAGMENT_BIN_START:
         case WStype_FRAGMENT:
         case WStype_FRAGMENT_FIN:
             break;
+    }
+}
+
+void testConnection(const char* host) {
+    Serial.printf("\n--- Testing %s ---\n", host);
+
+    IPAddress ip;
+    if (WiFi.hostByName(host, ip)) {
+        Serial.print("DNS OK: ");
+        Serial.println(ip);
+    } else {
+        Serial.println("DNS FAILED");
+        return;
+    }
+
+    WiFiClient plain;
+    if (plain.connect(ip, 443)) {
+        Serial.println("TCP OK");
+        plain.stop();
+    } else {
+        Serial.println("TCP FAILED");
+        return;
+    }
+
+    WiFiClientSecure tls;
+    tls.setInsecure();
+    if (tls.connect(host, 443)) {
+        Serial.println("TLS OK");
+        tls.stop();
+    } else {
+        char err[100];
+        int code = tls.lastError(err, sizeof(err));
+        Serial.printf("TLS FAILED: %d %s\n", code, err);
     }
 }
 
@@ -72,8 +109,11 @@ void setup() {
     Serial.println("\nWiFi connected. IP address: ");
     Serial.println(WiFi.localIP());
 
-    // Setup WebSocket
-    webSocket.begin(ws_host, ws_port, ws_path);
+    testConnection(ws_host);
+    testConnection("example.com");
+
+    webSocket.beginSSL(ws_host, ws_port, ws_path);
+    webSocket.setExtraHeaders("ngrok-skip-browser-warning: true");
     webSocket.onEvent(webSocketEvent);
     
     // Automatically attempt to reconnect if connection drops
