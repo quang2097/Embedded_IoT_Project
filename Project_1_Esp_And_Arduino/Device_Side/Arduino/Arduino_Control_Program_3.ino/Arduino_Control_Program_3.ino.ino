@@ -76,12 +76,12 @@ void evaluateRoof(int light, float temp) {
 
   if (wantsOpen && openRoof == 0) {
     transmitData("ROOF_OPENING", light, 0, 0, temp);
-    stepMotor(512);
+    stepMotor(-512);
     openRoof = 1; // Update state!
   } 
   else if (wantsClose && openRoof == 1) {
     transmitData("ROOF_CLOSING", light, 0, 0, temp);
-    stepMotor(-512);
+    stepMotor(512);+
     openRoof = 0; // Update state!
   }
 }
